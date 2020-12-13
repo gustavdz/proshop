@@ -16,7 +16,7 @@ import {
   ORDER_DELIVER_RESET,
 } from "../constants/orderConstants";
 
-const OrderScreen = ({ match }) => {
+const OrderScreen = ({ match, history }) => {
   const orderId = match.params.id;
   const dispatch = useDispatch();
 
@@ -46,6 +46,9 @@ const OrderScreen = ({ match }) => {
   }
 
   useEffect(() => {
+    if (!userInfo) {
+      history.push("/login");
+    }
     const addPaypalScript = async () => {
       const { data: clientId } = await axios.get("/api/config/paypal");
       const script = document.createElement("script");
@@ -205,17 +208,20 @@ const OrderScreen = ({ match }) => {
                 </ListGroup.Item>
               )}
               {loadingDeliver && <Loader />}
-              {userInfo.isAdmin && order.isPaid && !order.isDelivered && (
-                <ListGroup.Item>
-                  <Button
-                    type="button"
-                    className="btn btn-block"
-                    onClick={deliverHandler}
-                  >
-                    Mark As delivered
-                  </Button>
-                </ListGroup.Item>
-              )}
+              {userInfo &&
+                userInfo.isAdmin &&
+                order.isPaid &&
+                !order.isDelivered && (
+                  <ListGroup.Item>
+                    <Button
+                      type="button"
+                      className="btn btn-block"
+                      onClick={deliverHandler}
+                    >
+                      Mark As delivered
+                    </Button>
+                  </ListGroup.Item>
+                )}
             </ListGroup>
           </Card>
         </Col>
